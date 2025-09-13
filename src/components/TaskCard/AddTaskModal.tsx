@@ -18,19 +18,17 @@ import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
 import { Calendar } from "../ui/calendar"
 import { format } from "date-fns"
-import { useDispatch, useSelector } from "react-redux"
-import { addTask } from "@/redux/features/task/taskSlice"
-import { selectUser } from "@/redux/features/user/userSlice"
 import { useState } from "react"
+import { useCreateTaskMutation } from "@/redux/api/baseApi"
 
 export function AddTaskModal() {
     const form = useForm()
     const [open, setOpen] = useState(false)
-    const dispatch = useDispatch()
-    const users = useSelector(selectUser);
-    console.log(users[0].id)
-    const onSubmit = (data: any) => {
-        dispatch(addTask(data))
+    const [createTask, {data, isLoading, isError, isSuccess}] = useCreateTaskMutation()
+    console.log(data);
+    const onSubmit = async(data: any) => {
+        const res = await createTask(data).unwrap();
+        console.log("Inside something",res);
         setOpen(false)
         form.reset()
     }
@@ -86,29 +84,6 @@ export function AddTaskModal() {
                                                 <SelectItem value="low">Low</SelectItem>
                                                 <SelectItem value="medium">Medium</SelectItem>
                                                 <SelectItem value="high">High</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="userAssign"
-                                render={({ field }) => (
-                                    <FormItem className="w-full mt-5">
-                                        <FormLabel>Assign User</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl className="w-full">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a User to assign" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="w-full">
-                                                {users?.map((user: any) => (
-                                                    <SelectItem key={user.id} value={user.name}>
-                                                        {user.name}
-                                                    </SelectItem>
-                                                ))}
                                             </SelectContent>
                                         </Select>
                                     </FormItem>
